@@ -531,9 +531,6 @@ for x in range(12,120,1):
     df_p=predict(models,name,x_score, index)
     # df_predict=pd.concat([df_p,df_index['CUSTOMER_KEY']], axis=1)
     defection=pd.concat([df_p, defection], axis=1)
-    print defection
-    # print "prediction ",df_p
-
     print("--- %s seconds ---" % (time.time() - start_time))
 
                                                     # ***************************END TEST************************************************
