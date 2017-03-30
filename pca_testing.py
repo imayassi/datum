@@ -59,8 +59,16 @@ cont_features, bool_features, catag_features, _, _, _=customer_type_features(ct)
 # 'NEW TO TURBOTAX'
 conn = pyodbc.connect(dsn='VerticaProd')
 random_state = np.random.RandomState(0)
+lists=['ABANDONED', 'TAX_YEAR','CUSTOMER_KEY']
+data="select %d from CTG_ANALYTICS_WS.SM_RETENTION_MODEL  WHERE   TAX_YEAR<2014 limit 10 "%lists
+
+print data
+
 data = "SELECT * FROM (SELECT * FROM  CTG_ANALYTICS_WS.SM_RETENTION_MODEL  WHERE   TAX_YEAR<2014 AND TAX_DAY<=150)A   order by random() limit 100000"
 df = pd.read_sql(data, conn, index_col=['CUSTOMER_KEY'], coerce_float=False)
+
+
+
 print list(df)
 df_cont = df[cont_features]
 df_cont.columns = df_cont.columns.str.strip()

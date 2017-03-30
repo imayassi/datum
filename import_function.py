@@ -3,13 +3,13 @@ import pyodbc
 import pandas as pd
 from sklearn import preprocessing
 conn = pyodbc.connect(dsn='VerticaProd')
-
+from features_by_customer_type import customer_type_features
+ct='New'
+cont_features, bool_features, catag_features, cont_score_features, bool_score_features, catag_score_features=customer_type_features(ct)
 
 def import_scoring_data(scoring_data, cont_score_features, bool_score_features, catag_score_features):
     df = pd.read_sql(scoring_data, conn, index_col='CUSTOMER_KEY', coerce_float=False)
     # df = df_raw[df_raw['TAX_YEAR'] == 2016]
-    print df
-
     df_cont = df[cont_score_features]
     # print df_cont
 
@@ -40,7 +40,6 @@ def import_scoring_data(scoring_data, cont_score_features, bool_score_features, 
     just_dummies = pd.get_dummies(df_char)
     # print 'SCORING...', just_dummies
     df_trans = pd.concat([df_bool, just_dummies, data_scaled], axis=1)
-
     return df_trans, df_cont
 
 
@@ -74,16 +73,16 @@ def import_data(data, cont_features, bool_features, catag_features, scoring_df):
     just_dummies = pd.get_dummies(df_char)
     print 'just_dummies done'
     df_trans = pd.concat([df_bool, just_dummies, data_scaled], axis=1)
+    df_trans.drop(['ABANDONED'], axis=1, inplace=True)
+    print df_trans
     print 'df_trans done'
     new_list = list(set(list(df_trans)) & set(list(scoring_df)))
     print 'new feature list done'
     df_trans_pca2 = df_trans[new_list]
-    print list(df_trans_pca2)
-    return df_trans_pca2, df_bool, df_cont
+
+    return df_trans, df_bool, df_cont
 
 
 
-b=list(set(list(df_no_pca)) - set(list(scoring_df)))
-print b
-scoring_df=scoring_df[b]
-print list(scoring_df)
+
+
