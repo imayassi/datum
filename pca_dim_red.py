@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.decomposition import PCA, NMF
 
-def pca_code(df_no_pca,df_cont,bool_df, i):
+def pca_code(df_no_pca,response, i):
     do_pca=i
     if do_pca=='True':
         pca = PCA(n_components=100, random_state=np.random.RandomState(0))
@@ -16,11 +16,12 @@ def pca_code(df_no_pca,df_cont,bool_df, i):
         reduced_df = pd.DataFrame(pca.components_, columns=df_no_pca.columns, index=pca_column_name)
         sig_features = list(set(reduced_df.idxmax(axis=1).values))
         df_final = df_no_pca[sig_features]
-        bool=pd.DataFrame(bool_df['ABANDONED'], columns=['ABANDONED'])
+        bool=pd.DataFrame(df_no_pca[response], columns=[response])
         bool.reset_index(level=['CUSTOMER_KEY'], inplace=True)
-        df = pd.concat([df_final, bool['ABANDONED']], axis=1)
-
+        df = pd.concat([df_final, bool[response]], axis=1)
+        df.set_index('CUSTOMER_KEY', inplace=True)
     else:
-        df=pd.concat([df_no_pca, bool_df['ABANDONED']], axis=1)
+
+        df=df_no_pca
         pca=()
-    return df, pca, df_cont
+    return df, pca

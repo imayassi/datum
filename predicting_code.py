@@ -29,14 +29,25 @@ def bin_pca_score_set(df_trans_pca, length_dict, j):
     if b_pca == 'True':
         pca_leng = {}
         leng = len(length_dict)
-        for i in df_trans_pca.columns:
-            if i in length_dict:
+        lists=list(df_trans_pca.select_dtypes(exclude=[np.bool]))
+        df_cont=df_trans_pca.select_dtypes(exclude=[np.bool])
+        for i in lists:
+            if i in length_dict and length_dict[i]>2:
+                print i, length_dict[i]
                 pca_level = 'pcl_'
-                labels = [pca_level + `r` for r in range(length_dict[i])]
-                df_trans_pca[i] = pd.cut(df_trans_pca[i], bins=length_dict[i], labels=labels, include_lowest=True)
+                dict_list = [length_dict[i] for i in length_dict]
+                print 'dict list', dict_list
+                labels = [pca_level + `r` for r in range(dict_list[0])]
+                print 'df_trans_pca[i]', df_trans_pca[i]
+
+                print 'length_dict[i]', length_dict[i]
+                print labels
+                df_trans_pca[i] = pd.cut(df_cont[i], bins=length_dict[i], labels=labels, include_lowest=True)
                 pca_leng[i] = leng
-            elif i not in length_dict:
+            else:
                 df_trans_pca.drop([i], axis=1, inplace=True)
+            # elif i not in length_dict:
+            #     df_trans_pca.drop([i], axis=1, inplace=True)
         df_trans_pca_dummy = pd.get_dummies(df_trans_pca)
         scoring_df_trans = df_trans_pca_dummy
 
@@ -53,8 +64,9 @@ def get_scoring_arrays(scoring_df_trans):
 
 def score_set_feature_selection(scoring_df_trans, plsca, k):
     fc = k
+    x=scoring_df_trans
     if fc == 'True':
-        x3 = plsca.transform(x)
+        x3 = plsca.transform(x).values
         string = "pls_"
         pls_column_name = [string + `i` for i in range(x3.shape[1])]
         df1 = pd.DataFrame(x3, columns=pls_column_name)
