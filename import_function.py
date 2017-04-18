@@ -58,23 +58,25 @@ def import_data(data, cont_features, bool_features,response, catag_features):
     df_cont = df_cont.astype(float)
 
     df_bool = df_cont[bool_features]
-    df_bool['paid_something'] = 0
-
-    df_bool['paid_something'][df[response] > 0]=1
-    df_cont.drop([response], axis=1, inplace=True)
-    df_bool['paid_something'].astype('bool')
-    print df_bool
-    for f in df_bool.columns:
-        if len(df_bool[f].unique())<2:
-            df_bool.drop([f], axis=1, inplace=True)
-
-    bool=df_bool.astype('bool')
-    df_bool=bool
+    # df_bool['paid_something'] = 0
+    #
+    # df_bool['paid_something'][df[response] > 0]=1
+    # df_cont.drop([response], axis=1, inplace=True)
+    # df_bool['paid_something'].astype('bool')
+    # print df_bool
+    # for f in df_bool.columns:
+    #     if len(df_bool[f].unique())<2:
+    #         df_bool.drop([f], axis=1, inplace=True)
+    #
+    # bool=df_bool.astype('bool')
+    # df_bool=bool
 
     df_cont.drop(bool_features, axis=1, inplace=True)
 
     index_df = pd.DataFrame(df_cont.reset_index(level=['CUSTOMER_KEY']), columns=['CUSTOMER_KEY'])
     print 'df_cont done'
+    print df_cont
+
     data_scaled = pd.DataFrame(preprocessing.normalize(df_cont), columns=df_cont.columns)
     # data_scaled = pd.concat([data_scaled, index_df], axis=1)
     # data_scaled.set_index('CUSTOMER_KEY', inplace=True)

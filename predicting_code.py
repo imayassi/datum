@@ -33,8 +33,9 @@ def bin_pca_score_set(df_trans_pca, length_dict, j):
         df_cont=df_trans_pca.select_dtypes(exclude=[np.bool])
         for i in lists:
             if i in length_dict and length_dict[i]>2:
-                print i, length_dict[i]
+                print i
                 pca_level = 'pcl_'
+
                 dict_list = [length_dict[i] for i in length_dict]
                 print 'dict list', dict_list
                 labels = [pca_level + `r` for r in range(dict_list[0])]

@@ -71,7 +71,7 @@ def algorithm(x,y):
     y = y.astype(int)
     poly = PolynomialFeatures(2)
     # r=poly.fit_transform(x)
-    print list(r)
+
     X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=.3, random_state=np.random.RandomState(0))
 
     names = [
