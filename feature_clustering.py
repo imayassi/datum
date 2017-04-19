@@ -9,7 +9,7 @@ from sklearn.svm import SVR, LinearSVC
 from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
 from sklearn.feature_selection import SelectKBest, chi2, mutual_info_classif, mutual_info_regression,VarianceThreshold
 from sklearn.linear_model import RandomizedLasso, RandomizedLogisticRegression
-
+from sklearn import cluster
 
 
 depth_panelty=0.005
@@ -45,7 +45,7 @@ def feature_clustering(df_no_pca,response, i):
 
 
     df=df2.sample(frac=0.1)
-    print df.shape
+    print 'sample dataframe shape is: ', df.shape
     y = df[response]
     x = df.drop([response], axis=1)
 
@@ -66,7 +66,7 @@ def feature_clustering(df_no_pca,response, i):
         dict[m] = avg - (m * depth_panelty)
     print dict
     j = max(dict.iterkeys(), key=lambda k: dict[k])
-    print j
+    print 'the best # of components is:', j
     fc=i
     if fc == 'pls':
         # PLS appraoch
@@ -114,13 +114,22 @@ def feature_clustering(df_no_pca,response, i):
 
         plsca=pca
 
+
+    elif fc == 'fa':
+        x = df_no_pca.drop([response], axis=1)
+        agglo = cluster.FeatureAgglomeration(n_clusters=j)
+        x3 = agglo.fit_transform(x)
+        string = "fa_"
+        df_final = pd.DataFrame(x3)
+        bool = pd.DataFrame(Y, columns=[response])
+        df = pd.concat([df_final, bool[response]], axis=1)
+        labels=pd.DataFrame(agglo.labels_,columns=['Feature_cluster'], index=list(x)).sort_values(['Feature_cluster'], inplace=True)
+        print labels
+        plsca = agglo
+
     else:
 
-        bool = pd.DataFrame(Y, columns=[response])
-        # bool.reset_index(level=['CUSTOMER_KEY'], inplace=True)
-        df = pd.concat([df_final, bool[response]], axis=1)
-        # df.set_index('CUSTOMER_KEY', inplace=True)
-        print df.shape
+        df=df_no_pca
         plsca = []
 
-    return df, bool[response], plsca
+    return df, df[response], plsca

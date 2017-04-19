@@ -75,7 +75,7 @@ def import_data(data, cont_features, bool_features,response, catag_features):
 
     index_df = pd.DataFrame(df_cont.reset_index(level=['CUSTOMER_KEY']), columns=['CUSTOMER_KEY'])
     print 'df_cont done'
-    print df_cont
+
 
     data_scaled = pd.DataFrame(preprocessing.normalize(df_cont), columns=df_cont.columns)
     # data_scaled = pd.concat([data_scaled, index_df], axis=1)

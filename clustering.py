@@ -1,4 +1,4 @@
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, Birch, AffinityPropagation
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import cross_val_score
@@ -13,9 +13,10 @@ def obs_clustering(df,response,clust):
         x = df2.drop([response], axis=1)
 
 
-        for m in range(5, 40, 5):
-            kmeans = KMeans(n_clusters=m, random_state=np.random.RandomState(0))
-            x_kmeans=kmeans.fit_transform(x)
+        for m in range(5, 20, 5):
+            # , random_state = np.random.RandomState(0)
+            kmeans = KMeans(n_clusters=m)
+            x_kmeans = kmeans.fit_transform(x)
             clustered_df = pd.DataFrame(x_kmeans)
             dt = DecisionTreeClassifier(max_depth=1000)
             # dt = DecisionTreeRegressor(max_depth=1000)
@@ -29,11 +30,13 @@ def obs_clustering(df,response,clust):
         print j
 
         x=df.drop([response], axis=1)
-        kmeans = KMeans(n_clusters=j, random_state=np.random.RandomState(0))
-        X=kmeans.fit_transform(x)
-        # print kmeans.labels_, kmeans.cluster_centers_
+        KMeans(n_clusters=m)
+
+        X = kmeans.fit_transform(x)
+
 
         cluster_labels=pd.DataFrame(kmeans.labels_, columns=['LABELS'])
+        print cluster_labels['LABELS'].value_counts()
         clustered_df = pd.DataFrame(X)
         df_final=pd.concat([clustered_df,cluster_labels,df], axis=1)
         df_orig_with_clust_labels=pd.concat([cluster_labels,df], axis=1)
