@@ -12,7 +12,7 @@ from sklearn.linear_model import RandomizedLasso, RandomizedLogisticRegression
 from sklearn import cluster
 
 
-depth_panelty=0.005
+depth_panelty=0.0005
 def feature_clustering(df_no_pca,response, i):
 
     # y=bool_df[response] #use this funtion if abandoned was the response

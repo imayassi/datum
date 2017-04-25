@@ -82,9 +82,9 @@ def algorithm(x,y, response):
     X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=.3, random_state=np.random.RandomState(0))
 
     names = [
-        # "Nearest Neighbors" ,
+        "Nearest Neighbors" ,
         # "Decision_Tree",
-        # "Random_Forest",
+        "Random_Forest",
         "logistic_regression"
         # "NeuralNetworkLogistic",
         # "NeuralNetwork",
@@ -98,9 +98,9 @@ def algorithm(x,y, response):
     ]
 
     classifiers = [
-        # KNeighborsClassifier(n_neighbors=20, leaf_size=1),
+        KNeighborsClassifier(n_neighbors=5, leaf_size=1),
         # DecisionTreeClassifier(criterion='entropy'),
-        # RandomForestClassifier(criterion='entropy', n_estimators=200),
+        RandomForestClassifier(criterion='entropy', n_estimators=200),
         linear_model.LogisticRegression()
         # MLPClassifier(alpha=1e-5,activation='logistic', random_state = random_state),
         # MLPClassifier(alpha=1e-5, random_state=random_state),
@@ -197,7 +197,11 @@ def algorithm(x,y, response):
             feature_df2 = pd.DataFrame(reg.coef_[0], columns=['sig'], index=naming).sort_values(['sig'],ascending=False)
             feature_df2.to_csv(path_or_buf='defection_model_segments.txt', index=True)
             print feature_df2
-
+            y_pred = reg.predict(X_test)
+            precision = average_precision_score(y_test, y_pred)
+            recall = recall_score(y_test, y_pred)
+            auc = roc_auc_score(y_test, y_pred)
+            print precision, recall, auc
 
 
             # , "recall_avg ", recall_avg, "precision_avg ", precision_avg
