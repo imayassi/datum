@@ -155,7 +155,40 @@ def algorithm(x,y):
             # print list(clf.coef_),clf.coef_[0]
             feature_df = pd.DataFrame(clf.coef_[0], columns=['sig'], index=naming).abs().sort_values(['sig'],ascending=False)
             feature_df2 = pd.DataFrame(clf.coef_[0], columns=['sig'], index=naming).sort_values(['sig'],ascending=False)
+            top_features = feature_df2.nlargest(10, 'sig')
+            top_features.drop(['sig'], axis=1, inplace=True)
+            print
+            list(top_features)
+            top_df = pd.concat([df[top_features['index'].tolist()], y], axis=1)
 
+            y = top_df[response]
+            x = top_df.drop(response, 1)
+
+            x, y = shuffle(x, y, random_state=np.random.RandomState(0))
+            y = y.astype(int)
+            poly = PolynomialFeatures(3)
+            r = poly.fit_transform(x)
+            print
+            list(x)
+            feature_interaction = poly.get_feature_names(list(x))
+            df = DataFrame(r, columns=feature_interaction)
+
+            X_train, X_test, y_train, y_test = train_test_split(df, y, test_size=.3,
+                                                                random_state=np.random.RandomState(0))
+            reg = linear_model.LogisticRegression()
+            reg.fit(X_train, y_train)
+            naming = list(X_train)
+            feature_df2 = pd.DataFrame(reg.coef_[0], columns=['sig'], index=naming).sort_values(['sig'],
+                                                                                                ascending=False)
+            feature_df2.to_csv(path_or_buf='defection_model_segments.txt', index=True)
+            print
+            feature_df2
+            y_pred = reg.predict(X_test)
+            precision = average_precision_score(y_test, y_pred)
+            recall = recall_score(y_test, y_pred)
+            auc = roc_auc_score(y_test, y_pred)
+            print
+            precision, recall, auc
 
         # filename = 'finalized_model.sav'
         # pickle.dump(clf, open(filename, 'wb'))
