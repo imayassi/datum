@@ -65,13 +65,12 @@ from sklearn import linear_model
 from sklearn.neural_network import MLPRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
-def algorithm(x,y):
+def algorithm(x,y, response):
     models = []
+
     x, y = shuffle(x, y, random_state=np.random.RandomState(0))
     y = y.astype(int)
-    poly = PolynomialFeatures(2)
-    # r=poly.fit_transform(x)
-    print list(r)
+
     X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=.3, random_state=np.random.RandomState(0))
 
     names = [
@@ -150,16 +149,18 @@ def algorithm(x,y):
         if name=="Random_Forest":
             # print clf.feature_importances_
             feature_df = pd.DataFrame(clf.feature_importances_, columns=['sig'], index=naming).sort_values(['sig'],ascending=False)
+            feature_df.to_csv(path_or_buf='tto_revenue_model_rf_features.txt', index=True)
             print feature_df
         elif name == "logistic_regression":
             # print list(clf.coef_),clf.coef_[0]
             feature_df = pd.DataFrame(clf.coef_[0], columns=['sig'], index=naming).abs().sort_values(['sig'],ascending=False)
             feature_df2 = pd.DataFrame(clf.coef_[0], columns=['sig'], index=naming).sort_values(['sig'],ascending=False)
+            feature_df2.to_csv(path_or_buf='tto_revenue_model_features.txt', index=True)
+            feature_df2.reset_index(['index'], inplace=True)
             top_features = feature_df2.nlargest(10, 'sig')
             top_features.drop(['sig'], axis=1, inplace=True)
-            print
-            list(top_features)
-            top_df = pd.concat([df[top_features['index'].tolist()], y], axis=1)
+            print  list(top_features)
+            top_df = pd.concat([x[top_features['index'].tolist()], y], axis=1)
 
             y = top_df[response]
             x = top_df.drop(response, 1)
@@ -180,7 +181,7 @@ def algorithm(x,y):
             naming = list(X_train)
             feature_df2 = pd.DataFrame(reg.coef_[0], columns=['sig'], index=naming).sort_values(['sig'],
                                                                                                 ascending=False)
-            feature_df2.to_csv(path_or_buf='defection_model_segments.txt', index=True)
+            feature_df2.to_csv(path_or_buf='tto_revenue_model_segments.txt', index=True)
             print
             feature_df2
             y_pred = reg.predict(X_test)
