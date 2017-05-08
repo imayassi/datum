@@ -100,7 +100,7 @@ def algorithm(x,y, response):
     classifiers = [
         # KNeighborsClassifier(n_neighbors=5, leaf_size=1),
         # DecisionTreeClassifier(criterion='entropy'),
-        RandomForestClassifier(criterion='entropy', n_estimators=200),
+        RandomForestClassifier(criterion='entropy', n_estimators=200, min_samples_leaf=50000),
         linear_model.LogisticRegression()
         # MLPClassifier(alpha=1e-5,activation='logistic', random_state = random_state),
         # MLPClassifier(alpha=1e-5, random_state=random_state),
@@ -159,6 +159,11 @@ def algorithm(x,y, response):
             feature_df = pd.DataFrame(clf.feature_importances_, columns=['sig'], index=naming).sort_values(['sig'],ascending=False)
             print feature_df
         elif name == "logistic_regression":
+            # import statsmodels.api as sm
+            # X2 = sm.add_constant(X_train)
+            # est = sm.OLS(y_train, X2)
+            # est2 = est.fit()
+            # print(est2.summary())
             # print list(clf.coef_),clf.coef_[0]
             feature_df = pd.DataFrame(clf.coef_[0], columns=['sig'], index=naming).abs().sort_values(['sig'],ascending=False)
             feature_df2 = pd.DataFrame(clf.coef_[0], columns=['sig'], index=naming).sort_values(['sig'],ascending=False)
@@ -170,21 +175,22 @@ def algorithm(x,y, response):
 
         # filename = 'finalized_model.sav'
         # pickle.dump(clf, open(filename, 'wb'))
-            print feature_df
-            print feature_df2
-            top_features = feature_df2.nlargest(10, 'sig')
-            top_features.drop(['sig'], axis=1, inplace=True)
-            print list(top_features)
-            top_df = pd.concat([df[top_features['index'].tolist()], y], axis=1)
 
-            y = top_df[response]
-            x = top_df.drop(response, 1)
+            top_features=feature_df2[np.exp(feature_df2['sig']) >= 1.1]
+            # top_features = feature_df2.nlargest(20, 'sig')
+            # top_features.drop(['sig'], axis=1, inplace=True)
+
+            top_df = pd.concat([df[top_features['index'].tolist()], y], axis=1)
+            top_df2 = top_df.sample(frac=0.1)
+            print 'Features with >1.1 odds ratio', list(top_df)
+            y = top_df2[response]
+            x = top_df2.drop(response, 1)
 
             x, y = shuffle(x, y, random_state=np.random.RandomState(0))
             y = y.astype(int)
             poly = PolynomialFeatures(3)
             r = poly.fit_transform(x)
-            print list(x)
+            # print list(x)
             feature_interaction=poly.get_feature_names(list(x))
             df=DataFrame(r, columns=feature_interaction)
 
@@ -196,7 +202,7 @@ def algorithm(x,y, response):
             naming = list(X_train)
             feature_df2 = pd.DataFrame(reg.coef_[0], columns=['sig'], index=naming).sort_values(['sig'],ascending=False)
             feature_df2.to_csv(path_or_buf='defection_model_segments.txt', index=True)
-            print feature_df2
+            # print feature_df2
             y_pred = reg.predict(X_test)
             precision = average_precision_score(y_test, y_pred)
             recall = recall_score(y_test, y_pred)

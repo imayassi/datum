@@ -12,7 +12,11 @@ def import_scoring_data(scoring_data, cont_score_features, bool_score_features, 
 
     df_cont.columns = df_cont.columns.str.strip()
     df_cont.fillna(value=0, inplace=True)
-    df_cont.replace(to_replace=('(null)', 'NA', 'None'), value=0.000000001)
+    avg=df_cont.mean(axis=0, skipna=True)
+    a=list(avg)
+    for i in range(len(a)):
+        for j in df_cont:
+            df_cont[j].replace(to_replace=('(null)', 'NA'), value=a[i])
     df_cont = df_cont.astype(float)
 
 
@@ -38,7 +42,7 @@ def import_scoring_data(scoring_data, cont_score_features, bool_score_features, 
     df_char.columns = df_char.columns.str.strip()
     df_char.fillna(value='-1', inplace=True)
     df_char.replace(to_replace=('(null)', 'NA', 'None', '', ' ', '\t'), value='-1')
-
+    b=list(df_char)
     just_dummies = pd.get_dummies(df_char).astype('bool')
 
     df_trans = pd.concat([df_bool, just_dummies, df_cont], axis=1)
@@ -52,11 +56,12 @@ def import_data(data, cont_features, bool_features,response, catag_features):
     df_cont.columns = df_cont.columns.str.strip()
 
     df_cont.fillna(value=0, inplace=True)
-    df_cont.replace(to_replace=('(null)', 'NA'), value=0.000000001)
-
-
+    avg=df_cont.mean(axis=0, skipna=True)
+    a=list(avg)
+    for i in range(len(a)):
+        for j in df_cont:
+            df_cont[j].replace(to_replace=('(null)', 'NA'), value=a[i])
     df_cont = df_cont.astype(float)
-
     df_bool = df_cont[bool_features]
     # df_bool['paid_something'] = 0
     #
@@ -73,7 +78,7 @@ def import_data(data, cont_features, bool_features,response, catag_features):
 
     df_cont.drop(bool_features, axis=1, inplace=True)
 
-    index_df = pd.DataFrame(df_cont.reset_index(level=['CUSTOMER_KEY']), columns=['CUSTOMER_KEY'])
+    # index_df = pd.DataFrame(df_cont.reset_index(level=['CUSTOMER_KEY']), columns=['CUSTOMER_KEY'])
     print 'df_cont done'
 
 
@@ -86,7 +91,9 @@ def import_data(data, cont_features, bool_features,response, catag_features):
     df_char.columns = df_char.columns.str.strip()
     df_char.fillna(value='-1', inplace=True)
     df_char.replace(to_replace=('(null)', 'NA'), value='-1')
+
     just_dummies = pd.get_dummies(df_char).astype('bool')
+
 
     print 'just_dummies done'
     df_trans = pd.concat([df_bool, just_dummies, df_cont], axis=1)
