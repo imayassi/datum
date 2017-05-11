@@ -91,8 +91,8 @@ def algorithm(x,y, response):
 
     classifiers = [
         # KNeighborsClassifier(n_neighbors=20, leaf_size=1),
-        DecisionTreeClassifier(criterion='entropy'),
-        RandomForestClassifier(criterion='entropy', n_estimators=200),
+        DecisionTreeClassifier(criterion='entropy', min_samples_leaf=10000),
+        RandomForestClassifier(criterion='entropy', n_estimators=200,min_samples_leaf=10000),
         linear_model.LogisticRegression(),
         MLPClassifier(alpha=1e-5,activation='logistic', random_state = random_state),
         MLPClassifier(alpha=1e-5, random_state=random_state),
@@ -149,7 +149,7 @@ def algorithm(x,y, response):
         if name=="Random_Forest":
             # print clf.feature_importances_
             feature_df = pd.DataFrame(clf.feature_importances_, columns=['sig'], index=naming).sort_values(['sig'],ascending=False)
-            feature_df.to_csv(path_or_buf='tto_revenue_model_rf_features.txt', index=True)
+            feature_df.to_csv(path_or_buf='tto_revenue_model_rf_features3.txt', index=True)
             print feature_df
         elif name == "logistic_regression":
             # print list(clf.coef_),clf.coef_[0]
@@ -174,14 +174,13 @@ def algorithm(x,y, response):
             feature_interaction = poly.get_feature_names(list(x))
             df = DataFrame(r, columns=feature_interaction)
 
-            X_train, X_test, y_train, y_test = train_test_split(df, y, test_size=.3,
-                                                                random_state=np.random.RandomState(0))
+            X_train, X_test, y_train, y_test = train_test_split(df, y, test_size=.3,random_state=np.random.RandomState(0))
             reg = linear_model.LogisticRegression()
             reg.fit(X_train, y_train)
             naming = list(X_train)
             feature_df2 = pd.DataFrame(reg.coef_[0], columns=['sig'], index=naming).sort_values(['sig'],
                                                                                                 ascending=False)
-            feature_df2.to_csv(path_or_buf='tto_revenue_model_segments.txt', index=True)
+            feature_df2.to_csv(path_or_buf='tto_revenue_model_segments3.txt', index=True)
             print
             feature_df2
             y_pred = reg.predict(X_test)

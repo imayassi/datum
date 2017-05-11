@@ -47,8 +47,10 @@ def import_scoring_data(scoring_data, cont_score_features, bool_score_features, 
 
 def import_data(data, cont_features, bool_features,response, catag_features):
     df = pd.read_sql(data, conn, coerce_float=False)
-
+    print list(df)
+    print cont_features
     df_cont = df[cont_features]
+    print list(df_cont)
     df_cont.columns = df_cont.columns.str.strip()
 
     df_cont.fillna(value=0, inplace=True)
@@ -56,6 +58,7 @@ def import_data(data, cont_features, bool_features,response, catag_features):
 
 
     df_cont = df_cont.astype(float)
+    print list(df_cont)
 
     df_bool = df_cont[bool_features]
     df_bool['paid_something'] = 0
@@ -63,7 +66,7 @@ def import_data(data, cont_features, bool_features,response, catag_features):
     df_bool['paid_something'][df[response] > 0]=1
     df_cont.drop([response], axis=1, inplace=True)
     df_bool['paid_something'].astype('bool')
-    print df_bool
+
     for f in df_bool.columns:
         if len(df_bool[f].unique())<2:
             df_bool.drop([f], axis=1, inplace=True)

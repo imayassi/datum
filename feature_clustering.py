@@ -51,7 +51,7 @@ def feature_clustering(df_no_pca,response, i):
 
     # index=df_no_pca['CUSTOMER_KEY']
     dict = {}
-    for m in range(50, 200, 20):
+    for m in range(50, 200, 10):
         # plsca = PLSRegression(n_components=m)
         # plsca.fit(x, y)
         # score = cross_val_score(plsca, x, y, scoring='r2')
@@ -114,13 +114,13 @@ def feature_clustering(df_no_pca,response, i):
 
         plsca=pca
 
-    else:
+    elif fc=='none':
 
-        bool = pd.DataFrame(Y, columns=[response])
+        bool = df_no_pca[response]
         # bool.reset_index(level=['CUSTOMER_KEY'], inplace=True)
-        df = pd.concat([df_final, bool[response]], axis=1)
+        df = df_no_pca
         # df.set_index('CUSTOMER_KEY', inplace=True)
         print df.shape
         plsca = []
 
-    return df, bool[response], plsca
+    return df, bool, plsca
