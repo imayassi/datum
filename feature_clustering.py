@@ -51,7 +51,7 @@ def feature_clustering(df_no_pca,response, i):
 
     # index=df_no_pca['CUSTOMER_KEY']
     dict = {}
-    for m in range(50, 200, 10):
+    for m in range(50, 100, 10):
         # plsca = PLSRegression(n_components=m)
         # plsca.fit(x, y)
         # score = cross_val_score(plsca, x, y, scoring='r2')

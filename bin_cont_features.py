@@ -35,7 +35,8 @@ def bin_pca(df_pca,response, j):
                 pca_leng[k] = leng
             else:
                 df_pca.drop([k], axis=1, inplace=True)
-        df = pd.get_dummies(df_pca).astype('bool')
+        df = pd.get_dummies(df_pca)
+            # .astype('bool')
         training_df=pd.concat([df, y], axis=1)
     else:
         training_df=df_pca
