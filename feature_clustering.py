@@ -51,7 +51,7 @@ def feature_clustering(df_no_pca,response, i):
 
     # index=df_no_pca['CUSTOMER_KEY']
     dict = {}
-    for m in range(30, 200, 5):
+    for m in range(100, 300, 10):
         # plsca = PLSRegression(n_components=m)
         # plsca.fit(x, y)
         # score = cross_val_score(plsca, x, y, scoring='r2')
@@ -59,7 +59,7 @@ def feature_clustering(df_no_pca,response, i):
         pca.fit_transform(x)
         x=pd.DataFrame(x)
         # svr=DecisionTreeRegressor(max_depth=1000)
-        svr = DecisionTreeClassifier(max_depth=1000)
+        svr = DecisionTreeClassifier(max_depth=100)
         svr.fit(x,y)
         score = cross_val_score(svr, x, y, scoring='precision')
         avg = np.mean(score) * 100

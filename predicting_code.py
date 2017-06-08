@@ -10,9 +10,9 @@ def transform_to_pca(data, fitted_pca, i):
         string = "pca_"
         pca_column_name = [string + `i` for i in range(scoring_data.shape[1])]
         df = pd.DataFrame(scoring_data, columns=pca_column_name)
-        data.reset_index(['CUSTOMER_KEY'], inplace=True)
+        data.reset_index(['AUTH_ID'], inplace=True)
 
-        data.drop(['CUSTOMER_KEY'], axis=1, inplace=True)
+        data.drop(['AUTH_ID'], axis=1, inplace=True)
         reduced_df = pd.DataFrame(fitted_pca.components_, columns=data.columns, index=pca_column_name)
 
         sig_features = list(set(reduced_df.idxmax(axis=1).values))
@@ -37,14 +37,20 @@ def bin_pca_score_set(df_trans_pca, length_dict, j):
                 pca_level = 'pcl_'
 
                 dict_list = [length_dict[i] for i in length_dict]
-                print 'dict list', dict_list
-                labels = [pca_level + `r` for r in range(dict_list[0])]
-                print 'df_trans_pca[i]', df_trans_pca[i]
+                for m in dict_list:
 
-                print 'length_dict[i]', length_dict[i]
-                print labels
-                df_trans_pca[i] = pd.cut(df_cont[i], bins=length_dict[i], labels=labels, include_lowest=True)
-                pca_leng[i] = leng
+                    df_trans_pca[i + m[0] + repr(m[1])] = 0
+                    if m[0] == '<=' and len(m) == 2:
+                        df_trans_pca[i + m[0] + repr(m[1])][df_trans_pca[i] <= m[1]] = 1
+
+                    elif m[0] == '>=' and len(m) == 2:
+                        df_trans_pca[i + m[0] + repr(m[1])][df_trans_pca[i] >= m[1]] = 1
+
+                    elif len(m) == 4:
+                        df_trans_pca[i + m[0] + repr(m[1]) + m[2] + repr(m[3])] = 0
+                        df_trans_pca[i + m[0] + repr(m[1]) + m[2] + repr(m[3])][(df_trans_pca[i] > m[1]) & (df_trans_pca[i] < m[3])] = 1
+                        df_trans_pca.drop([i], axis=1, inplace=True)
+
             else:
                 df_trans_pca.drop([i], axis=1, inplace=True)
             # elif i not in length_dict:
@@ -66,7 +72,7 @@ def get_scoring_arrays(scoring_df_trans):
 def score_set_feature_selection(scoring_df_trans, plsca, k):
     fc = k
     x=scoring_df_trans
-    if fc == 'True':
+    if fc == 'pls':
         x3 = plsca.transform(x).values
         string = "pls_"
         pls_column_name = [string + `i` for i in range(x3.shape[1])]
@@ -74,19 +80,41 @@ def score_set_feature_selection(scoring_df_trans, plsca, k):
         plsca_df = pd.DataFrame(plsca.x_weights_)
         plsca_trans = plsca_df.transpose()
 
-        x.reset_index(['CUSTOMER_KEY'], inplace=True)
-        index = x['CUSTOMER_KEY']
-        x.drop(['CUSTOMER_KEY'], axis=1, inplace=True)
+        x.reset_index(['AUTH_ID'], inplace=True)
+        index = x['AUTH_ID']
+        x.drop(['AUTH_ID'], axis=1, inplace=True)
         reduced_df = pd.DataFrame(plsca_trans.values, columns=x.columns, index=pls_column_name)
         sig_features = list(set(reduced_df.idxmax(axis=1).values))
-
         df_final = pd.concat([x[sig_features], index], axis=1)
-        df_final.set_index('CUSTOMER_KEY', inplace=True)
-    else:
-        # x.set_index('CUSTOMER_KEY', inplace=True)
+        df_final.set_index('AUTH_ID', inplace=True)
+    if fc == 'pca':
+    #     x3 = plsca.transform(scoring_df_trans)
+    #     string = "pca_"
+    #     pca_column_name = [string + `i` for i in range(x3.shape[1])]
+    #
+    #     df1 = pd.DataFrame(x3, columns=pls_column_name)
+    #     plsca_df = pd.DataFrame(plsca.x_weights_)
+    #     plsca_trans = plsca_df.transpose()
+    #
+    #     x.reset_index(['CUSTOMER_KEY'], inplace=True)
+    #     index = x['CUSTOMER_KEY']
+    #     x.drop(['CUSTOMER_KEY'], axis=1, inplace=True)
+    #
+    #     reduced_df = pd.DataFrame(pca.components_, columns=x.columns, index=pca_column_name)
+    #     sig_features = list(set(reduced_df.idxmax(axis=1).values))
+    #
+    #     x = df_no_pca
+    #
+    #     df_final = pd.concat([x[sig_features], index], axis=1)
+    #     df_final.set_index('CUSTOMER_KEY', inplace=True)
+    #
+    #     df.set_index('CUSTOMER_KEY', inplace=True)
+    # else:
+    #     # x.set_index('CUSTOMER_KEY', inplace=True)
         df_final = scoring_df_trans
-        scoring_df_trans.reset_index(['CUSTOMER_KEY'], inplace=True)
-        index = scoring_df_trans['CUSTOMER_KEY']
+        scoring_df_trans.reset_index(['AUTH_ID'], inplace=True)
+        index = scoring_df_trans['AUTH_ID']
+
 
     return df_final, index
 
@@ -103,5 +131,5 @@ def predict(models, name, x_score, index):
         ABANDONED[name + '_defect_prob'] = retain_prob
     scored_df = pd.DataFrame.from_dict(ABANDONED)
     scored_df = pd.concat([scored_df, index], axis=1)
-    scored_df.set_index('CUSTOMER_KEY', inplace=True)
+    scored_df.set_index('AUTH_ID', inplace=True)
     return scored_df
