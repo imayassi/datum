@@ -102,7 +102,7 @@ def algorithm(x,y, response):
         QuadraticDiscriminantAnalysis(),
         BaggingClassifier(bootstrap_features=True,random_state=np.random.RandomState(0)),
         ExtraTreesClassifier(criterion='entropy', random_state=np.random.RandomState(0)),
-        GradientBoostingClassifier(n_estimators=1000, max_depth=10000, random_state= np.random.RandomState(0))
+        GradientBoostingClassifier(n_estimators=100, max_depth=100, random_state= np.random.RandomState(0))
     ]
     # names = [
     #     # "Nearest Neighbors" ,
@@ -149,13 +149,13 @@ def algorithm(x,y, response):
         if name=="Random_Forest":
             # print clf.feature_importances_
             feature_df = pd.DataFrame(clf.feature_importances_, columns=['sig'], index=naming).sort_values(['sig'],ascending=False)
-            feature_df.to_csv(path_or_buf='tto_revenue_model_rf_features3.txt', index=True)
+            feature_df.to_csv(path_or_buf='tto_revenue_model_rf_features2.txt', index=True)
             print feature_df
         elif name == "logistic_regression":
             # print list(clf.coef_),clf.coef_[0]
             feature_df = pd.DataFrame(clf.coef_[0], columns=['sig'], index=naming).abs().sort_values(['sig'],ascending=False)
             feature_df2 = pd.DataFrame(clf.coef_[0], columns=['sig'], index=naming).sort_values(['sig'],ascending=False)
-            feature_df2.to_csv(path_or_buf='tto_revenue_model_features.txt', index=True)
+            feature_df2.to_csv(path_or_buf='tto_revenue_model_features2.txt', index=True)
             feature_df2.reset_index(['index'], inplace=True)
             top_features = feature_df2.nlargest(10, 'sig')
             top_features.drop(['sig'], axis=1, inplace=True)
@@ -180,7 +180,7 @@ def algorithm(x,y, response):
             naming = list(X_train)
             feature_df2 = pd.DataFrame(reg.coef_[0], columns=['sig'], index=naming).sort_values(['sig'],
                                                                                                 ascending=False)
-            feature_df2.to_csv(path_or_buf='tto_revenue_model_segments3.txt', index=True)
+            feature_df2.to_csv(path_or_buf='tto_revenue_model_segments2.txt', index=True)
             print
             feature_df2
             y_pred = reg.predict(X_test)

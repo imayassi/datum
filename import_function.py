@@ -49,10 +49,10 @@ def import_scoring_data(scoring_data, cont_score_features, bool_score_features, 
 
 def import_data(data, cont_features, bool_features,response, catag_features):
     df = pd.read_sql(data, conn, coerce_float=False)
-    print list(df)
-    print cont_features
+
+
     df_cont = df[cont_features]
-    print list(df_cont)
+
     df_cont.columns = df_cont.columns.str.strip()
 
     df_cont.fillna(value=0, inplace=True)
@@ -60,7 +60,8 @@ def import_data(data, cont_features, bool_features,response, catag_features):
 
 
     df_cont = df_cont.astype(float)
-    print list(df_cont)
+
+
 
     df_bool = df_cont[bool_features]
     df_bool['paid_something'] = 0
@@ -70,12 +71,12 @@ def import_data(data, cont_features, bool_features,response, catag_features):
     df_bool['paid_something']
         # .astype('bool')
 
+
     for f in df_bool.columns:
         if len(df_bool[f].unique())<2:
             df_bool.drop([f], axis=1, inplace=True)
 
-    bool=df_bool
-        # .astype('bool')
+    bool=df_bool.astype('bool')
     df_bool=bool
 
     df_cont.drop(bool_features, axis=1, inplace=True)
@@ -91,10 +92,9 @@ def import_data(data, cont_features, bool_features,response, catag_features):
     df_char.columns = df_char.columns.str.strip()
     df_char.fillna(value='-1', inplace=True)
     df_char.replace(to_replace=('(null)', 'NA'), value='-1')
-    just_dummies = pd.get_dummies(df_char)
-        # .astype('bool')
-
+    just_dummies = pd.get_dummies(df_char).astype('bool')
     print 'just_dummies done'
+
     df_trans = pd.concat([df_bool, just_dummies, df_cont], axis=1)
     # df_trans.drop(['ABANDONED'], axis=1, inplace=True)
     print 'df_trans done'
