@@ -119,16 +119,25 @@ def score_set_feature_selection(scoring_df_trans, plsca, k):
     return df_final, index
 
 
+
 def predict(models, name, x_score, index):
     ABANDONED = {}
     for name, clf in zip(name, models):
-        flag = clf.predict(x_score)
-        likelihood = clf.predict_proba(x_score)
-        defect_prob = [item[0] for item in likelihood]
-        retain_prob = [item[1] for item in likelihood]
-        ABANDONED[name + '_flag'] = flag
-        ABANDONED[name + '_retain_prob'] = defect_prob
-        ABANDONED[name + '_defect_prob'] = retain_prob
+        if name != "Support Vector" and name != "rbf_svc" and name != "poly_svc" and name != "lin_svc":
+            flag = clf.predict(x_score)
+            likelihood = clf.predict_proba(x_score)
+            defect_prob = [item[0] for item in likelihood]
+            retain_prob = [item[1] for item in likelihood]
+            ABANDONED[name + '_flag'] = flag
+            ABANDONED[name + '_retain_prob'] = defect_prob
+            ABANDONED[name + '_defect_prob'] = retain_prob
+        else:
+            flag = clf.predict(x_score)
+            defect_prob = 0
+            retain_prob = 0
+            ABANDONED[name + '_flag'] = flag
+            ABANDONED[name + '_retain_prob'] = defect_prob
+            ABANDONED[name + '_defect_prob'] = retain_prob
     scored_df = pd.DataFrame.from_dict(ABANDONED)
     scored_df = pd.concat([scored_df, index], axis=1)
     scored_df.set_index('AUTH_ID', inplace=True)

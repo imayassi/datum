@@ -79,19 +79,23 @@ def algorithm(x,y, response):
     poly = PolynomialFeatures(2)
     # r=poly.fit_transform(x)
 
-    X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=.3, random_state=np.random.RandomState(0))
-
+    X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=.1, random_state=np.random.RandomState(0))
+    C=1.0
     names = [
         # "Nearest Neighbors" ,
-        "Decision_Tree",
-        "Random_Forest",
-        "logistic_regression",
+        # "Support Vector",
+        "rbf_svc",
+        "poly_svc",
+        "lin_svc",
+        # "Decision_Tree",
+        # "Random_Forest",
+        "logistic_regression"
         # "NeuralNetworkLogistic",
         # "NeuralNetwork",
-        # "AdaBoost",
-         "Naive Bayes",
-        "Bernouli Niave Bayes"
-        # "QDA",
+        # # "AdaBoost",
+        #  "Naive Bayes",
+        # "Bernouli Niave Bayes"
+        # # "QDA",
         # "Bagging" ,
         # "ERT",
         # "GB"
@@ -99,14 +103,18 @@ def algorithm(x,y, response):
 
     classifiers = [
         # KNeighborsClassifier(n_neighbors=5, leaf_size=1),
-        DecisionTreeClassifier(criterion='entropy'),
-        RandomForestClassifier(criterion='entropy', n_estimators=200),
-        linear_model.LogisticRegression(),
+        # svm.SVC(kernel='linear', C=C),
+        svm.SVC(kernel='rbf', gamma=0.7, C=C),
+        svm.SVC(kernel='poly', degree=3, C=C),
+        svm.LinearSVC(C=C),
+        # DecisionTreeClassifier(criterion='entropy'),
+        # RandomForestClassifier(criterion='entropy', n_estimators=200),
+        linear_model.LogisticRegression()
         # MLPClassifier(alpha=1e-5,activation='logistic', random_state = random_state),
         # MLPClassifier(alpha=1e-5, random_state=random_state),
-        # AdaBoostClassifier(n_estimators=100),
-        GaussianNB(),
-        BernoulliNB(alpha=1.0, binarize=0.0, class_prior=None, fit_prior=True)
+        # # AdaBoostClassifier(n_estimators=100),
+        # GaussianNB(),
+        # BernoulliNB(alpha=1.0, binarize=0.0, class_prior=None, fit_prior=True)
         # QuadraticDiscriminantAnalysis(),
         # BaggingClassifier(bootstrap_features=True,random_state=np.random.RandomState(0)),
         # ExtraTreesClassifier(criterion='entropy', random_state=np.random.RandomState(0)),
@@ -159,7 +167,7 @@ def algorithm(x,y, response):
         if name=="Random_Forest":
             # print clf.feature_importances_
             feature_df = pd.DataFrame(clf.feature_importances_, columns=['sig'], index=naming).sort_values(['sig'],ascending=False)
-            print feature_df
+
             feature_df.to_csv(path_or_buf='defection_model_features_rf_ANC.txt', index=True)
         # if name == "Decision_Tree":
         #     from IPython.display import Image
@@ -196,8 +204,7 @@ def algorithm(x,y, response):
             # top_features = feature_df2.nlargest(20, 'sig')
             # top_features.drop(['sig'], axis=1, inplace=True)
             print top_features
-            print y
-            print x
+
             top_df = pd.concat([x[top_features['index'].tolist()], y], axis=1)
             top_df2 = top_df.sample(frac=0.1)
             print 'Features with >1.1 odds ratio', list(top_df)
