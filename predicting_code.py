@@ -1,8 +1,6 @@
 import pandas as pd
 import numpy as np
-from sklearn.decomposition import PCA, NMF
-from sklearn import preprocessing
-from sklearn.cross_decomposition import PLSRegression
+import pickle
 def transform_to_pca(data, fitted_pca, i):
     do_pca = i
     if do_pca == 'True':
@@ -21,14 +19,13 @@ def transform_to_pca(data, fitted_pca, i):
     else:
         df = data
 
+
     return df
 
 
 def bin_pca_score_set(df_trans_pca, length_dict, j):
     b_pca = j
     if b_pca == 'True':
-        pca_leng = {}
-        leng = len(length_dict)
         lists=list(df_trans_pca.select_dtypes(exclude=[np.bool]))
         df_cont=df_trans_pca.select_dtypes(exclude=[np.bool])
         for i in lists:
@@ -53,8 +50,6 @@ def bin_pca_score_set(df_trans_pca, length_dict, j):
 
             else:
                 df_trans_pca.drop([i], axis=1, inplace=True)
-            # elif i not in length_dict:
-            #     df_trans_pca.drop([i], axis=1, inplace=True)
         df_trans_pca_dummy = pd.get_dummies(df_trans_pca)
         scoring_df_trans = df_trans_pca_dummy
 
@@ -88,29 +83,6 @@ def score_set_feature_selection(scoring_df_trans, plsca, k):
         df_final = pd.concat([x[sig_features], index], axis=1)
         df_final.set_index('AUTH_ID', inplace=True)
     if fc == 'pca':
-    #     x3 = plsca.transform(scoring_df_trans)
-    #     string = "pca_"
-    #     pca_column_name = [string + `i` for i in range(x3.shape[1])]
-    #
-    #     df1 = pd.DataFrame(x3, columns=pls_column_name)
-    #     plsca_df = pd.DataFrame(plsca.x_weights_)
-    #     plsca_trans = plsca_df.transpose()
-    #
-    #     x.reset_index(['CUSTOMER_KEY'], inplace=True)
-    #     index = x['CUSTOMER_KEY']
-    #     x.drop(['CUSTOMER_KEY'], axis=1, inplace=True)
-    #
-    #     reduced_df = pd.DataFrame(pca.components_, columns=x.columns, index=pca_column_name)
-    #     sig_features = list(set(reduced_df.idxmax(axis=1).values))
-    #
-    #     x = df_no_pca
-    #
-    #     df_final = pd.concat([x[sig_features], index], axis=1)
-    #     df_final.set_index('CUSTOMER_KEY', inplace=True)
-    #
-    #     df.set_index('CUSTOMER_KEY', inplace=True)
-    # else:
-    #     # x.set_index('CUSTOMER_KEY', inplace=True)
         df_final = scoring_df_trans
         scoring_df_trans.reset_index(['AUTH_ID'], inplace=True)
         index = scoring_df_trans['AUTH_ID']
@@ -119,11 +91,11 @@ def score_set_feature_selection(scoring_df_trans, plsca, k):
     return df_final, index
 
 
-
+# name != "Support Vector" and name != "rbf_svc" and name != "poly_svc" and name != "lin_svc"
 def predict(models, name, x_score, index):
     ABANDONED = {}
     for name, clf in zip(name, models):
-        if name != "Support Vector" and name != "rbf_svc" and name != "poly_svc" and name != "lin_svc":
+        if name== "logistic_regression" :
             flag = clf.predict(x_score)
             likelihood = clf.predict_proba(x_score)
             defect_prob = [item[0] for item in likelihood]
@@ -141,4 +113,5 @@ def predict(models, name, x_score, index):
     scored_df = pd.DataFrame.from_dict(ABANDONED)
     scored_df = pd.concat([scored_df, index], axis=1)
     scored_df.set_index('AUTH_ID', inplace=True)
+
     return scored_df

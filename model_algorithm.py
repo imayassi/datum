@@ -84,11 +84,11 @@ def algorithm(x,y, response):
     names = [
         # "Nearest Neighbors" ,
         # "Support Vector",
-        "rbf_svc",
-        "poly_svc",
-        "lin_svc",
-        # "Decision_Tree",
-        # "Random_Forest",
+        # "rbf_svc",
+        # "poly_svc",
+        # "lin_svc",
+        "Decision_Tree",
+        "Random_Forest",
         "logistic_regression"
         # "NeuralNetworkLogistic",
         # "NeuralNetwork",
@@ -103,13 +103,13 @@ def algorithm(x,y, response):
 
     classifiers = [
         # KNeighborsClassifier(n_neighbors=5, leaf_size=1),
-        # svm.SVC(kernel='linear', C=C),
-        svm.SVC(kernel='rbf', gamma=0.7, C=C),
-        svm.SVC(kernel='poly', degree=3, C=C),
-        svm.LinearSVC(C=C),
-        # DecisionTreeClassifier(criterion='entropy'),
-        # RandomForestClassifier(criterion='entropy', n_estimators=200),
-        linear_model.LogisticRegression()
+        # svm.SVC(kernel='linear', C=C,class_weight= 'balanced',random_state=np.random.RandomState(0)),
+        # svm.SVC(kernel='rbf', gamma=0.7, C=C, class_weight='balanced',random_state=np.random.RandomState(0)),
+        # svm.SVC(kernel='poly', degree=3, C=C,  class_weight= 'balanced',random_state=np.random.RandomState(0)),
+        # svm.LinearSVC(C=C,  class_weight= {0:.5, 1:.5},probability=True),
+        DecisionTreeClassifier(criterion='entropy'),
+        RandomForestClassifier(criterion='entropy', n_estimators=200, random_state=np.random.RandomState(0)),
+        linear_model.LogisticRegression( random_state=np.random.RandomState(0))
         # MLPClassifier(alpha=1e-5,activation='logistic', random_state = random_state),
         # MLPClassifier(alpha=1e-5, random_state=random_state),
         # # AdaBoostClassifier(n_estimators=100),
@@ -120,27 +120,6 @@ def algorithm(x,y, response):
         # ExtraTreesClassifier(criterion='entropy', random_state=np.random.RandomState(0)),
         # GradientBoostingClassifier(n_estimators=1000, max_depth=10000, random_state= np.random.RandomState(0))
     ]
-    # names = [
-    #     # "Nearest Neighbors" ,
-    #     "Decision_Tree",
-    #     "RandomForestRegressor",
-    #     "svr_rbf",
-    #     "svr_lin",
-    #     "svr_poly",
-    #     "regression",
-    #     "MLP_Regressor"
-    # ]
-    #
-    # classifiers = [
-    #     # KNeighborsClassifier(n_neighbors=20, leaf_size=1),
-    #     DecisionTreeRegressor(max_depth=1000),
-    #     RandomForestRegressor(n_estimators=200,random_state= np.random.RandomState(0)),
-    #     SVR(kernel='rbf', C=1e3, gamma=0.1),
-    #     SVR(kernel='linear', C=1e3),
-    #     SVR(kernel='poly', C=1e3, degree=2),
-    #     linear_model.LinearRegression(),
-    #     MLPRegressor()
-    # ]
 
 
 
@@ -165,30 +144,12 @@ def algorithm(x,y, response):
 
 
         if name=="Random_Forest":
-            # print clf.feature_importances_
+            naming = list(X_train)
             feature_df = pd.DataFrame(clf.feature_importances_, columns=['sig'], index=naming).sort_values(['sig'],ascending=False)
-
             feature_df.to_csv(path_or_buf='defection_model_features_rf_ANC.txt', index=True)
-        # if name == "Decision_Tree":
-        #     from IPython.display import Image
-        #     from sklearn import tree
-        #     import pydotplus
-        #     dot_data = tree.export_graphviz(clf, out_file='tree.dot', feature_names=list(X_train),
-        #                                     class_names=list(y_train),
-        #                                     filled=True, rounded=True,
-        #                                     special_characters=True
-        #                                     )
-        #     graph = pydotplus.graph_from_dot_data(dot_data)
-        #     graph.write_pdf("ret_dt.pdf")
-        #     Image(graph.create_png())
 
         elif name == "logistic_regression":
-            # import statsmodels.api as sm
-            # X2 = sm.add_constant(X_train)
-            # est = sm.OLS(y_train, X2)
-            # est2 = est.fit()
-            # print(est2.summary())
-            # print list(clf.coef_),clf.coef_[0]
+            naming = list(X_train)
             feature_df = pd.DataFrame(clf.coef_[0], columns=['sig'], index=naming).abs().sort_values(['sig'],ascending=False)
             feature_df2 = pd.DataFrame(clf.coef_[0], columns=['sig'], index=naming).sort_values(['sig'],ascending=False)
             feature_df2.to_csv(path_or_buf='defection_model_features_ANC.txt', index=True)
@@ -197,12 +158,9 @@ def algorithm(x,y, response):
 
 
 
-        # filename = 'finalized_model.sav'
-        # pickle.dump(clf, open(filename, 'wb'))
 
             top_features=feature_df2[np.exp(feature_df2['sig']) >=1.1 ]
-            # top_features = feature_df2.nlargest(20, 'sig')
-            # top_features.drop(['sig'], axis=1, inplace=True)
+
             print top_features
 
             top_df = pd.concat([x[top_features['index'].tolist()], y], axis=1)
@@ -238,6 +196,11 @@ def algorithm(x,y, response):
 
 
             # , "recall_avg ", recall_avg, "precision_avg ", precision_avg
+
+        filename = 'finalized_model.sav'
+        pickle.dump(clf, open(filename, 'wb'))
+        filename2 = 'name.sav'
+        pickle.dump(clf, open(filename2, 'wb'))
 
         models.append(clf)
         # return name, ' model', ' precision score', precision, ' recall score', recall, ' f1 ', f1

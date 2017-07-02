@@ -2,13 +2,10 @@ from sklearn.cross_decomposition import PLSRegression
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import cross_val_score
-from sklearn.decomposition import PCA, NMF
-from sklearn.metrics import mean_squared_error
-from sklearn import linear_model
-from sklearn.svm import SVR, LinearSVC
-from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
-from sklearn.feature_selection import SelectKBest, chi2, mutual_info_classif, mutual_info_regression,VarianceThreshold
-from sklearn.linear_model import RandomizedLasso, RandomizedLogisticRegression
+from sklearn.decomposition import PCA
+from sklearn.tree import  DecisionTreeClassifier
+import pickle
+
 from sklearn import cluster
 
 
@@ -18,29 +15,7 @@ def feature_clustering(df_no_pca,response, i):
     # y=bool_df[response] #use this funtion if abandoned was the response
     Y = df_no_pca[response]
     x=df_no_pca.drop([response], axis=1)
-    # randomized_lasso = RandomizedLasso(selection_threshold=0.05,normalize=False,random_state= np.random.RandomState(0) ).fit_transform(x,Y)
-    # new_x = randomized_lasso
 
-    # randomized_logistic = RandomizedLogisticRegression(selection_threshold=0.05,normalize=False,random_state= np.random.RandomState(0) ).fit_transform(x,Y)
-    # new_x = randomized_logistic
-    # print new_x.shape
-    # sel = VarianceThreshold(threshold=(.001 * (1 - .001)))
-    # new_x = sel.fit_transform(x)
-    #
-    #
-    # print 'new x ', new_x
-    #
-    # reduced_df = pd.DataFrame(new_x)
-    # sig_features = list(set(reduced_df.idxmax(axis=1).values))
-    # print  'sig features ', sig_features
-    # x = df_no_pca
-    # df_final = x[sig_features]
-    # print list(df_final)
-    # pca_df = reduced_df[sig_features]
-    # bool = pd.DataFrame(Y, columns=[response])
-    # # df_final.reset_index(level=['CUSTOMER_KEY'], inplace=True)
-    # df = pd.concat([df_final, bool[response]], axis=1)
-    #
     df2=pd.concat([x,Y], axis=1)
 
 
@@ -131,5 +106,8 @@ def feature_clustering(df_no_pca,response, i):
 
         df=df_no_pca
         plsca = []
+    filename4 = 'feature_selection.sav'
+    pickle.dump(plsca, open(filename4, 'wb'))
+
 
     return df, df[response], plsca

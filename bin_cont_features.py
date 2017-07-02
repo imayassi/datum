@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from sklearn.decomposition import PCA, NMF
+import pickle
 from binning import bin
 
 def bin_pca(df_no_pca,response, j):
@@ -44,6 +44,9 @@ def bin_pca(df_no_pca,response, j):
     else:
         training_df=df_pca
         pca_leng={}
+
+    filename2 = 'bin_model.sav'
+    pickle.dump(pca_leng, open(filename2, 'wb'))
     return   training_df, pca_leng
 
 # dict={1:'a', 2:'b'}
