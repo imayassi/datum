@@ -80,14 +80,15 @@ def algorithm(x,y, response):
     # r=poly.fit_transform(x)
 
     X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=.3, random_state=np.random.RandomState(0))
-
+    from sklearn.svm import SVC
     names = [
         # "Nearest Neighbors" ,
         "Decision_Tree",
         "Random_Forest",
         "logistic_regression",
-        # "NeuralNetworkLogistic",
-        # "NeuralNetwork",
+        "NeuralNetworkLogistic",
+        "NeuralNetwork",
+        "svm",
         # "AdaBoost",
          "Naive Bayes",
         "Bernouli Niave Bayes"
@@ -102,8 +103,9 @@ def algorithm(x,y, response):
         DecisionTreeClassifier(criterion='entropy'),
         RandomForestClassifier(criterion='entropy', n_estimators=200),
         linear_model.LogisticRegression(),
-        # MLPClassifier(alpha=1e-5,activation='logistic', random_state = random_state),
-        # MLPClassifier(alpha=1e-5, random_state=random_state),
+        MLPClassifier(alpha=1e-5,activation='logistic', random_state = random_state),
+        MLPClassifier(alpha=1e-5, random_state=random_state),
+        SVC(probability=True, random_state=random_state),
         # AdaBoostClassifier(n_estimators=100),
         GaussianNB(),
         BernoulliNB(alpha=1.0, binarize=0.0, class_prior=None, fit_prior=True)
