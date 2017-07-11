@@ -89,6 +89,8 @@ def algorithm(x,y, response):
         "NeuralNetworkLogistic",
         "NeuralNetwork",
         "svm",
+        "svm_poly",
+        "svm_sigmoid",
         # "AdaBoost",
          "Naive Bayes",
         "Bernouli Niave Bayes"
@@ -106,6 +108,8 @@ def algorithm(x,y, response):
         MLPClassifier(alpha=1e-5,activation='logistic', random_state = random_state),
         MLPClassifier(alpha=1e-5, random_state=random_state),
         SVC(probability=True, random_state=random_state),
+        SVC(probability=True,kernel='poly', random_state=random_state),
+        SVC(probability=True, kernel='sigmoid', random_state=random_state),
         # AdaBoostClassifier(n_estimators=100),
         GaussianNB(),
         BernoulliNB(alpha=1.0, binarize=0.0, class_prior=None, fit_prior=True)
@@ -187,7 +191,7 @@ def algorithm(x,y, response):
             feature_df2 = pd.DataFrame(clf.coef_[0], columns=['sig'], index=naming).sort_values(['sig'],ascending=False)
             feature_df2.to_csv(path_or_buf='defection_model_features_ANC.txt', index=True)
             feature_df2.reset_index(['naming'], inplace=True)
-            print feature_df2
+
 
 
 
@@ -198,8 +202,7 @@ def algorithm(x,y, response):
             # top_features = feature_df2.nlargest(20, 'sig')
             # top_features.drop(['sig'], axis=1, inplace=True)
             print top_features
-            print y
-            print x
+        
             top_df = pd.concat([x[top_features['index'].tolist()], y], axis=1)
             top_df2 = top_df.sample(frac=0.1)
             print 'Features with >1.1 odds ratio', list(top_df)

@@ -44,7 +44,7 @@ def feature_clustering(df_no_pca,response, i):
     df2=pd.concat([x,Y], axis=1)
 
 
-    df=df2.sample(frac=0.1)
+    df=df2.sample(frac=0.01)
     print 'sample dataframe shape is: ', df.shape
     y = df[response]
     x = df.drop([response], axis=1)
