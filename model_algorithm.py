@@ -10,6 +10,7 @@ from sklearn.metrics import precision_score, recall_score, roc_auc_score,  avera
 from sklearn.metrics import confusion_matrix
 import pandas as pd
 from pandas import DataFrame
+from sklearn.svm import SVC
 import pickle
 random_state = np.random.RandomState(0)
 from sklearn.utils import shuffle
@@ -26,13 +27,14 @@ def algorithm(x,y, response):
     C=1.0
     names = [
         # "Nearest Neighbors" ,
-        # "Support Vector",
-        # "rbf_svc",
-        # "poly_svc",
+        "Support Vector",
+        "rbf_svc",
+        "poly_svc",
         # "lin_svc",
         "Decision_Tree",
         "Random_Forest",
         "logistic_regression"
+
         # "NeuralNetworkLogistic",
         # "NeuralNetwork",
         # # "AdaBoost",
@@ -46,9 +48,9 @@ def algorithm(x,y, response):
 
     classifiers = [
         # KNeighborsClassifier(n_neighbors=5, leaf_size=1),
-        # svm.SVC(kernel='linear', C=C,class_weight= 'balanced',random_state=np.random.RandomState(0)),
-        # svm.SVC(kernel='rbf', gamma=0.7, C=C, class_weight='balanced',random_state=np.random.RandomState(0)),
-        # svm.SVC(kernel='poly', degree=3, C=C,  class_weight= 'balanced',random_state=np.random.RandomState(0)),
+        SVC(kernel='linear', C=C,class_weight= 'balanced',random_state=np.random.RandomState(0)),
+        SVC(kernel='rbf', gamma=0.7, C=C, class_weight='balanced',random_state=np.random.RandomState(0)),
+        SVC(kernel='poly', degree=3, C=C,  class_weight= 'balanced',random_state=np.random.RandomState(0)),
         # svm.LinearSVC(C=C,  class_weight= {0:.5, 1:.5},probability=True),
         DecisionTreeClassifier(criterion='entropy'),
         RandomForestClassifier(criterion='entropy', n_estimators=200, random_state=np.random.RandomState(0)),
