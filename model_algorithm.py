@@ -10,11 +10,13 @@ from sklearn.metrics import precision_score, recall_score, roc_auc_score,  avera
 from sklearn.metrics import confusion_matrix
 import pandas as pd
 from pandas import DataFrame
-from sklearn.svm import SVC
+from sklearn.svm import SVC, LinearSVC
 import pickle
 random_state = np.random.RandomState(0)
 from sklearn.utils import shuffle
 from sklearn import linear_model
+from sklearn.neural_network import MLPClassifier
+from sklearn.neighbors import KNeighborsClassifier
 def algorithm(x,y, response):
     df=pd.concat([x,y], axis=1)
     y = df[response]
@@ -23,20 +25,19 @@ def algorithm(x,y, response):
     x, y = shuffle(x, y, random_state=np.random.RandomState(0))
     y = y.astype(int)
 
-    X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=.1, random_state=np.random.RandomState(0))
+    X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=.3, random_state=np.random.RandomState(0))
     C=1.0
     names = [
         # "Nearest Neighbors" ,
-        "Support Vector",
-        "rbf_svc",
-        "poly_svc",
+        # "Support Vector",
+        # "rbf_svc",
+        # "poly_svc",
         # "lin_svc",
         "Decision_Tree",
         "Random_Forest",
-        "logistic_regression"
-
-        # "NeuralNetworkLogistic",
-        # "NeuralNetwork",
+        "logistic_regression",
+        "NeuralNetworkLogistic",
+        "NeuralNetwork"
         # # "AdaBoost",
         #  "Naive Bayes",
         # "Bernouli Niave Bayes"
@@ -48,15 +49,15 @@ def algorithm(x,y, response):
 
     classifiers = [
         # KNeighborsClassifier(n_neighbors=5, leaf_size=1),
-        SVC(kernel='linear', C=C,class_weight= 'balanced',random_state=np.random.RandomState(0)),
-        SVC(kernel='rbf', gamma=0.7, C=C, class_weight='balanced',random_state=np.random.RandomState(0)),
-        SVC(kernel='poly', degree=3, C=C,  class_weight= 'balanced',random_state=np.random.RandomState(0)),
-        # svm.LinearSVC(C=C,  class_weight= {0:.5, 1:.5},probability=True),
+        # SVC(kernel='linear', C=C,random_state=np.random.RandomState(0)),
+        # SVC(kernel='rbf', gamma=0.7, C=C, random_state=np.random.RandomState(0)),
+        # SVC(kernel='poly', degree=3, C=C,  random_state=np.random.RandomState(0)),
+        # LinearSVC(C=C,  class_weight= {0:.5, 1:.5}),
         DecisionTreeClassifier(criterion='entropy'),
         RandomForestClassifier(criterion='entropy', n_estimators=200, random_state=np.random.RandomState(0)),
-        linear_model.LogisticRegression( random_state=np.random.RandomState(0))
-        # MLPClassifier(alpha=1e-5,activation='logistic', random_state = random_state),
-        # MLPClassifier(alpha=1e-5, random_state=random_state),
+        linear_model.LogisticRegression( random_state=np.random.RandomState(0)),
+        MLPClassifier(alpha=1e-5,activation='logistic', random_state = random_state),
+        MLPClassifier(alpha=1e-5, random_state=random_state)
         # # AdaBoostClassifier(n_estimators=100),
         # GaussianNB(),
         # BernoulliNB(alpha=1.0, binarize=0.0, class_prior=None, fit_prior=True)
