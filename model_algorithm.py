@@ -22,7 +22,7 @@ def algorithm(x,y, response):
     x, y = shuffle(x, y, random_state=np.random.RandomState(0))
     y = y.astype(int)
 
-    X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=.3, random_state=np.random.RandomState(0))
+    X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_state=np.random.RandomState(0))
     C=1.0
     names = [
         "Nearest Neighbors" ,
@@ -40,13 +40,13 @@ def algorithm(x,y, response):
 
     classifiers = [
         KNeighborsClassifier(n_neighbors=300,weights='distance', leaf_size=1),
-        SVC(kernel='linear', C=C,class_weight= {1: 0.6},random_state=np.random.RandomState(0)),
-        SVC(kernel='rbf', gamma=0.7, C=C, class_weight={1: 0.6},random_state=np.random.RandomState(0)),
-        SVC(kernel='poly', degree=4, C=C,  class_weight= {1: 0.6},random_state=np.random.RandomState(0)),
-        LinearSVC(C=C,  class_weight= {1: 0.6}),
-        DecisionTreeClassifier(criterion='entropy',class_weight= {1: 0.6}),
+        SVC(kernel='linear', C=C,class_weight= 'balanced',random_state=np.random.RandomState(0)),
+        SVC(kernel='rbf', gamma=0.7, C=C, class_weight='balanced',random_state=np.random.RandomState(0)),
+        SVC(kernel='poly', degree=4, C=C,  class_weight= 'balanced',random_state=np.random.RandomState(0)),
+        LinearSVC(C=C,  class_weight= 'balanced'),
+        DecisionTreeClassifier(criterion='entropy',class_weight= 'balanced'),
         RandomForestClassifier(criterion='entropy', n_estimators=100, random_state=np.random.RandomState(0)),
-        linear_model.LogisticRegression( random_state=np.random.RandomState(0),class_weight= {1: 0.6}),
+        linear_model.LogisticRegression( random_state=np.random.RandomState(0),class_weight= 'balanced'),
         MLPClassifier(alpha=1e-5,activation='logistic', random_state = random_state),
         MLPClassifier(alpha=1e-5, random_state=random_state)
 
@@ -63,7 +63,7 @@ def algorithm(x,y, response):
         auc=roc_auc_score(y_test, y_pred)
         f1=f1_score(y_test, y_pred)
         tn, fp, fn, tp=confusion_matrix(y_test, y_pred).ravel()
-        score = cross_val_score(clf, x, y, scoring='average_precision', cv=5)
+        score = cross_val_score(clf, x, y, scoring='average_precision', cv=3)
         cross_val = np.mean(score) * 100
 
         print name ,cross_val , precision, recall, f1, auc, tn, fp, fn, tp
