@@ -21,12 +21,10 @@ import difflib, keyword
 conn = pyodbc.connect(dsn='VerticaProd')
 import time
 start_time = time.time()
-query ="select distinct a.auth_id, lower(occupation_taxpayer) as occupations from ctg_analytics_ws.se_segmentation_analytics_master a inner join ctg_analytics_ws.agg_taxml_ytd b on a.auth_id=b.auth_id and b.tax_year=2016 where  a.tax_year = 2016 and qbse_activator_date is not null"
-
-    # "SELECT  AUTH_ID,  occupations FROM (SELECT AUTH_ID,  OCCUPATIONS  FROM (SELECT AUTH_ID, LOWER(OCCUPATION_TAXPAYER) AS OCCUPATIONS, ROW_NUMBER() OVER (PARTITION BY AUTH_ID  ORDER BY RECEIVED_DATE DESC) AS RANK  FROM OMT_CTG_WS.USER_TAX_PROFILE_DEV_TY15 WHERE LOWER(OCCUPATION_TAXPAYER) NOT LIKE'%xx%' AND  LOWER(OCCUPATION_TAXPAYER) IS NOT NULL AND  LOWER(OCCUPATION_TAXPAYER)<>'nan' and (LOWER(OCCUPATION_TAXPAYER)like '%driv%' or LOWER(OCCUPATION_TAXPAYER)like '%uber%' or LOWER(OCCUPATION_TAXPAYER)like '%lyft%'))U WHERE RANK=1 )O"
+query ="select auth_id, lower(occupation_taxpayer) as occupations from ctg_analytics_ws.agg_taxml_ytd where  tax_year = 2016 limit 100"
 
 df = pd.read_sql(query, conn,index_col='auth_id', coerce_float=False)
-
+df.fillna('Null Entry', inplace=True)
 df['occupations']=df['occupations'].str.replace('\d+', '')
 df['occupations']=df['occupations'].apply(lambda x: ''.join([i for i in x if i not in string.punctuation]))
 df['occupations']=df['occupations'].apply(lambda x: ''.join([i for i in x if not i.isdigit()]))
@@ -216,16 +214,9 @@ df = df.loc[drop_small_entries]
 df['occupations'] = df['occupations'].apply(lambda y: ''.join([i for i in y if i not in string.punctuation]))
 df['occupations'] = df['occupations'].apply(lambda y: ''.join([i for i in y if not i.isdigit()]))
 
-# s = df['occupations'].str.split(' ').apply(pd.Series, 1)
+
 df = df.replace('\d+', 'Empty_Field')
 df.fillna('Null Entry', inplace=True)
-
-# df2=df.join(s)
-# s2 = df['occupations'].str.split(',').apply(pd.Series, 1).stack()
-# s.index = s.index.droplevel(-1)
-
-
-
 df = df.replace('', 'Empty_Field')
 df.fillna('Empty_Field', inplace=True)
 df_values = df.reset_index().values
@@ -237,7 +228,7 @@ for w1 in words:
     b = [w1[1]]
     c = [w1[0]]
 
-    m = difflib.get_close_matches(b[0], klist, 1, 0.80)
+    m = difflib.get_close_matches(b[0], klist, 1, 0.60)
     if len(m) <1:
         m = ['No Match']
         # list.append(m)
@@ -255,7 +246,7 @@ df_x.set_index('AUTH_ID', inplace=True)
 df_x.replace(occu_dict, inplace=True)
 
 df=pd.concat([df['occupations'], df_x], axis=1)
-print df_x
+print df
 
 # complete_df=df['occupations']
 # for x in df2.columns[0:3]:

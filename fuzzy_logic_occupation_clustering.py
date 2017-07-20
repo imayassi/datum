@@ -53,7 +53,7 @@ u,s,v = lin.svd(A, full_matrices=False)
 # print v.shape
 
 data = u[:,0:]
-k_model=KMeans(n_clusters=50)
+k_model=KMeans(n_clusters=10)
 k_model.fit(data)
 centroids = k_model.cluster_centers_
 labels = k_model.labels_

@@ -44,14 +44,14 @@ def feature_clustering(df_no_pca,response, i):
     df2=pd.concat([x,Y], axis=1)
 
 
-    df=df2.sample(frac=0.01)
+    df=df2.sample(frac=1)
     print 'sample dataframe shape is: ', df.shape
     y = df[response]
     x = df.drop([response], axis=1)
 
     # index=df_no_pca['CUSTOMER_KEY']
     dict = {}
-    for m in range(100, 300, 10):
+    for m in range(10, 50, 10):
         # plsca = PLSRegression(n_components=m)
         # plsca.fit(x, y)
         # score = cross_val_score(plsca, x, y, scoring='r2')
