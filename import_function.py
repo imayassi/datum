@@ -211,9 +211,12 @@ def import_data(data,care_data,data_PY,data_PY2, cont_features, bool_features,re
 
     df_cont.drop(bool_features, axis=1, inplace=True)
     print 'df_cont done'
-    # data_scaled = pd.DataFrame(preprocessing.normalize(df_cont), columns=df_cont.columns)
-    # data_scaled = pd.concat([data_scaled, index_df], axis=1)
-    # data_scaled.set_index('CUSTOMER_KEY', inplace=True)
+    df_cont.reset_index(['AUTH_ID'], inplace=True)
+    index_df=df_cont['AUTH_ID']
+    df_cont.drop(['AUTH_ID'], axis=1, inplace=True)
+    data_scaled = pd.DataFrame(preprocessing.normalize(df_cont), columns=df_cont.columns)
+    data_scaled = pd.concat([data_scaled, index_df], axis=1)
+    data_scaled.set_index('AUTH_ID', inplace=True)
     df_char = df[catag_features]
     df_char.columns = df_char.columns.str.strip()
     df_char.fillna(value='-1', inplace=True)
@@ -242,9 +245,12 @@ def import_data(data,care_data,data_PY,data_PY2, cont_features, bool_features,re
 
     df_cont_py.drop(bool_features, axis=1, inplace=True)
     print 'df_cont_py done'
-    # data_scaled = pd.DataFrame(preprocessing.normalize(df_cont), columns=df_cont.columns)
-    # data_scaled = pd.concat([data_scaled, index_df], axis=1)
-    # data_scaled.set_index('CUSTOMER_KEY', inplace=True)
+    df_cont_py.reset_index(['AUTH_ID'], inplace=True)
+    index_df_py=df_cont_py['AUTH_ID']
+    df_cont_py.drop(['AUTH_ID'], axis=1, inplace=True)
+    data_scaled_py = pd.DataFrame(preprocessing.normalize(df_cont_py), columns= df_cont_py.columns)
+    data_scaled_py = pd.concat([data_scaled_py, index_df_py], axis=1)
+    data_scaled_py.set_index('AUTH_ID', inplace=True)
     df_char_py = df3[catag_features]
     df_char_py.columns = df_char_py.columns.str.strip()
     df_char_py.fillna(value='-1', inplace=True)
@@ -276,9 +282,12 @@ def import_data(data,care_data,data_PY,data_PY2, cont_features, bool_features,re
 
     df_cont_py2.drop(bool_features, axis=1, inplace=True)
     print 'df_cont_py2 done'
-    # data_scaled = pd.DataFrame(preprocessing.normalize(df_cont), columns=df_cont.columns)
-    # data_scaled = pd.concat([data_scaled, index_df], axis=1)
-    # data_scaled.set_index('CUSTOMER_KEY', inplace=True)
+    df_cont_py2.reset_index(['AUTH_ID'], inplace=True)
+    index_df_py2=df_cont_py2['AUTH_ID']
+    df_cont_py2.drop(['AUTH_ID'], axis=1, inplace=True)
+    data_scaled_py2 = pd.DataFrame(preprocessing.normalize(df_cont_py2), columns=df_cont_py2.columns)
+    data_scaled_py2 = pd.concat([data_scaled_py2, index_df_py2], axis=1)
+    data_scaled_py2.set_index('AUTH_ID', inplace=True)
     df_char_py2 = df4[catag_features]
     df_char_py2.columns = df_char_py2.columns.str.strip()
     df_char_py2.fillna(value='-1', inplace=True)
@@ -297,9 +306,9 @@ def import_data(data,care_data,data_PY,data_PY2, cont_features, bool_features,re
     boolean_df_py = pd.concat([df_bool_py, just_dummies_py], axis=1)
     boolean_df_py2 = pd.concat([df_bool_py2, just_dummies_py2], axis=1)
     df_j1=boolean_df.join(boolean_df_py,rsuffix='_py').astype('bool').fillna(value='False')
-    df_j2=df_cont.join(df_cont_py, rsuffix='_py').astype(float).fillna(value=0)
+    df_j2=data_scaled.join(data_scaled_py, rsuffix='_py').astype(float).fillna(value=0)
     df_j3 = df_j1.join(boolean_df_py2, rsuffix='_py2').astype('bool').fillna(value='False')
-    df_j4 = df_j2.join(df_cont_py2, rsuffix='_py2').astype(float).fillna(value=0)
+    df_j4 = df_j2.join(data_scaled_py2, rsuffix='_py2').astype(float).fillna(value=0)
     df_trans=pd.concat([df_j3,df_j4], axis=1)
     df_trans.fillna(value='False')
     # df_trans=df_j1.join(df_trans_py2,rsuffix='_py2')
@@ -346,9 +355,13 @@ def import_data(data,care_data,data_PY,data_PY2, cont_features, bool_features,re
 
     print 'df_cont done'
 
-    data_scaled = pd.DataFrame(preprocessing.normalize(df_cont_care), columns=df_cont_care.columns)
-    # data_scaled = pd.concat([data_scaled, index_df], axis=1)
-    # data_scaled.set_index('CUSTOMER_KEY', inplace=True)
+    df_cont_care.reset_index(['AUTH_ID'], inplace=True)
+    index_df_care=df_cont_care['AUTH_ID']
+    df_cont_care.drop(['AUTH_ID'], axis=1, inplace=True)
+    data_scaled_care = pd.DataFrame(preprocessing.normalize(df_cont_care), columns=df_cont_care.columns)
+    data_scaled_care = pd.concat([data_scaled_care, index_df_care], axis=1)
+    data_scaled_care.set_index('AUTH_ID', inplace=True)
+    cont = data_scaled_care.groupby(level=0).max()
     print 'data_scaled done'
 
     df_char_care = df2[care_catag_features]
